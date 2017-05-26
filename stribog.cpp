@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
 
 #include "types.h"
 #include "stribog.h"
 
-void print_hash(struct stribog_ctx_t *ctx)
+using namespace std;
+
+void print_hash(struct stribog *ctx)
 {
 	u8 i;
 
@@ -14,14 +17,14 @@ void print_hash(struct stribog_ctx_t *ctx)
 	putchar('\n');
 }
 
-void processing(char *s, stribog_ctx_t *ctx)
+void processing(char *s, struct stribog *ctx)
 {
 
 }
 
 int main(int argc, char *argv[])
 {
-	struct stribog_ctx_t ctx;
+	struct stribog ctx;
 
 	u8 message[64] = {
 		0xee, 0xe2, 0xe5, 0xf0, 0xee, 0xe3, 0xc8, 0x20,
@@ -37,7 +40,7 @@ int main(int argc, char *argv[])
 	cout << "Result:" << endl;
 
 	init(&ctx, HASH256);
-	stribog(&ctx, message1, sizeof(message1));
+	stribog(&ctx, message, sizeof(message));
 
 	printf("H^{256}: ");
 	print_hash(&ctx);
