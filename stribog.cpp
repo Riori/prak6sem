@@ -41,60 +41,64 @@ char symbol_to_hex(char c) {
 
 int main(int argc, char *argv[])
 {
-	struct stribog ctx;
-    
-    if (argc != 2) {
-        throw std::logic_error("1 argument is required");
-    }
-    
-    string path(argv[1]);
-    
-    string arg_prefix("--path=");
-    
-    auto iterators = std::mismatch(path.begin(), path.end(), arg_prefix.begin());
-    
-    if (iterators.second != arg_prefix.end()) {
-        throw std::logic_error("Not valid argument");
-    }
-    
-    fstream f(string(iterators.first, path.end()));
-    
-    if (!f.good()) {
-        throw std::logic_error("File opening failed");
-    }
-    
-    auto ii = istreambuf_iterator<char>(f.rdbuf());
-    auto eof = istreambuf_iterator<char>();
-    
-    string input;
-    
-    copy_n(ii, 6, std::back_inserter(input));
-    ii++;
-    
-    std::transform(input.begin(), input.end(), input.begin(), ::toupper);
-    
-    if (input != string("INPUT=")) {
-        throw std::logic_error("Wrong file structure");
-    }
-    
-    vector<u8> data;
-    
-    while (ii != eof && *ii != '\n') {
-        char ch1 = 0, ch2 = 0;
-        ch1 = *(ii++);
-        if (ii != eof && *ii != '\n') {
-            ch2 = *(ii++);
+    try {
+        struct stribog ctx;
+        
+        if (argc != 2) {
+            throw std::logic_error("1 argument is required");
         }
-        char res = symbol_to_hex(ch1)*16 + symbol_to_hex(ch2);
-        data.push_back(res);
+        
+        string path(argv[1]);
+        
+        string arg_prefix("--path=");
+        
+        auto iterators = std::mismatch(path.begin(), path.end(), arg_prefix.begin());
+        
+        if (iterators.second != arg_prefix.end()) {
+            throw std::logic_error("Not valid argument");
+        }
+        
+        fstream f(string(iterators.first, path.end()));
+        
+        if (!f.good()) {
+            throw std::logic_error("File opening failed");
+        }
+        
+        auto ii = istreambuf_iterator<char>(f.rdbuf());
+        auto eof = istreambuf_iterator<char>();
+        
+        string input;
+        
+        copy_n(ii, 6, std::back_inserter(input));
+        ii++;
+        
+        std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+        
+        if (input != string("INPUT=")) {
+            throw std::logic_error("Wrong file structure");
+        }
+        
+        vector<u8> data;
+        
+        while (ii != eof && *ii != '\n') {
+            char ch1 = 0, ch2 = 0;
+            ch1 = *(ii++);
+            if (ii != eof && *ii != '\n') {
+                ch2 = *(ii++);
+            }
+            char res = symbol_to_hex(ch1)*16 + symbol_to_hex(ch2);
+            data.push_back(res);
+        }
+        
+        init(&ctx, HASH256);
+        stribog(&ctx, &data[0], data.size()*sizeof(u8));
+        
+        f << "OUTPUT=";
+        print_hash(&ctx, f);
+        f << endl;
+    } catch (exception e) {
+        cerr << e.what() << endl;
     }
-
-	init(&ctx, HASH256);
-	stribog(&ctx, &data[0], data.size()*sizeof(u8));
-
-    f << "OUTPUT=";
-	print_hash(&ctx, f);
-    f << endl;
 
 	return 0;
 }
