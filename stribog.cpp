@@ -96,7 +96,8 @@ int main(int argc, char *argv[])
         f << "OUTPUT=";
         print_hash(&ctx, f);
         f << endl;
-    } catch (exception e) {
+    } catch (logic_error e) {
+        cerr << "ERROR!!! ";
         cerr << e.what() << endl;
     }
 
